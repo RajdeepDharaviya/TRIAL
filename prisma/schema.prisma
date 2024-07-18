@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//1
+model Organizer{
+  id Int @id @default(autoincrement())
+  company_name String
+  email String @unique
+  password String 
+  contact Decimal
+  isAct Boolean @default(true)
+}
+
+
+//2
+model User{
+  id Int @id @default(autoincrement())
+  firstname String 
+  lastname String
+  email String @unique
+  password String 
+  age Int
+  profession String 
+  contact Decimal
+  isAct Boolean @default(true)
+  Attendance Attendee[]
+  Registers TotalRegisters[]
+  feedbacks Feedback[]
+}
+
+//3
+model EventManager{
+  id Int @id @default(autoincrement())
+  e_name String
+  e_description String
+  e_date DateTime
+  e_type String
+  e_mode Boolean
+  e_rounds Int
+  e_isAct Boolean
+  Attendance Attendee[]
+  Tasks Task[]
+  Schedules Schedule[]
+  Budgets Budget[]
+  Eligiblities Eligiblity[]
+  Venues Venue[]
+  Registers TotalRegisters[]
+  feedbacks Feedback[]
+}
+
+//4
+model Attendee{
+  id Int @id @default(autoincrement())
+  event_id Int
+  event EventManager @relation(fields: [event_id],references: [id])
+  user_id Int
+  user User @relation(fields: [user_id],references: [id])
+}
+
+
+//5
+model Venue{
+  id Int @id @default(autoincrement())
+  event_id Int
+  event EventManager @relation(fields: [event_id],references: [id])
+  v_name String
+  capacity String
+}
+
+
+//6
+model Task{
+  id Int @id @default(autoincrement())
+  t_name String
+  event_id Int
+  event EventManager @relation(fields: [event_id],references: [id])
+}
+
+
+//7
+model Schedule{
+  id Int @id @default(autoincrement())
+  event_id Int
+  event EventManager @relation(fields: [event_id],references: [id])
+  start_time DateTime
+  end_time DateTime
+}
+
+
+//8
+model Budget{
+  id Int @id @default(autoincrement())
+  event_id Int
+  event EventManager @relation(fields: [event_id],references: [id])
+  total_budget BigInt 
+}
+
+//9
+model Eligiblity{
+  id Int @id @default(autoincrement())
+  e_profession String
+  event_id Int
+  event EventManager @relation(fields: [event_id],references: [id])
+}
+
+//10
+model TotalRegisters{
+  id Int @id @default(autoincrement())
+  even_id Int
+  event EventManager @relation(fields: [even_id],references: [id])
+  user_id Int
+  user User @relation(fields: [user_id],references: [id])
+}
+
+//11
+model Feedback{
+  id Int @id @default(autoincrement())
+  even_id Int
+  event EventManager @relation(fields: [even_id],references: [id])
+  user_id Int
+  user User @relation(fields: [user_id],references: [id])
+  suggestions String
+  experience String
+  rating Int
+}

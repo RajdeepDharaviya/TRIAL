@@ -1,0 +1,18 @@
+[
+  {
+    "firstname": "rajdeep",
+    "lastname": "dharaviya",
+    "email": "raj@gmail.com",
+    "password": "12345678",
+    "contact": 1234567890,
+    "age": 20,
+    "profession": "student",
+    "isAct": true
+  },
+  {
+    "company_name": "google",
+    "email": "google@gmail.com",
+    "password": "12345678",
+    "contact": 1234567890
+  }
+]
