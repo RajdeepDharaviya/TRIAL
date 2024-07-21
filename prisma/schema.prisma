@@ -21,6 +21,7 @@ model Organizer{
   password String 
   contact Decimal
   isAct Boolean @default(true)
+  events EventManager[]
 }
 
 
@@ -50,6 +51,9 @@ model EventManager{
   e_mode Boolean
   e_rounds Int
   e_isAct Boolean
+  e_fees Float
+  orgId Int
+  organization Organizer @relation(fields: [orgId],references: [id])
   Attendance Attendee[]
   Tasks Task[]
   Schedules Schedule[]
