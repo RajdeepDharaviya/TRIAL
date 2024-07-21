@@ -1,10 +1,10 @@
 const express = require("express");
 const { middlewareOrg } = require("../../middlewares/middleware");
 const { PrismaClient } = require("@prisma/client");
-const schRouter = express.Router();
+const elgRouter = express.Router();
 const prisma = new PrismaClient();
 
-schRouter.use(middlewareOrg);
+elgRouter.use(middlewareOrg);
 
 //Getting events from database
 const fetchEvents = async () => {
@@ -17,14 +17,22 @@ const fetchEvents = async () => {
         where: {
           e_isAct: true,
         },
+        include: {
+          Eligiblities: {
+            select: {
+              id,
+              e_profession,
+            },
+          },
+        },
       },
     },
   });
 };
 
-// Route for getting Schedules of events
-/* ************** "http://localhost:3000/organization/schedules" ***************/
-schRouter.get("/", async (req, res) => {
+// Route for getting tasks of events
+/* ************** "http://localhost:3000/organization/eligiblities" ***************/
+elgRouter.get("/", async (req, res) => {
   const events = fetchEvents();
 
   if (events) {
@@ -37,32 +45,31 @@ schRouter.get("/", async (req, res) => {
   }
 });
 
-// Route for adding Schedules into events
-/* ************** "http://localhost:3000/organization/schedules/add" ***************/
-schRouter.post("/add", async (req, res) => {
+// Route for adding eligiblities into events
+/* ************** "http://localhost:3000/organization/eligiblities/add" ***************/
+elgRouter.post("/add", async (req, res) => {
   const body = req.body;
 
-  const eventSchedules = await prisma.eventManager.create({
+  const eventeligiblities = await prisma.eventManager.create({
     where: {
       id: body.event_id,
     },
     data: {
-      Schedules: {
+      Eligiblities: {
         create: {
-          start_time: body.start_time,
-          end_time: body.end_time,
+          e_profession: body.e_profession,
         },
       },
     },
     include: {
-      Schedules: true,
+      Eligiblities: true,
     },
   });
 
-  if (eventSchedules) {
+  if (eventeligiblities) {
     res.status(responseCode.Success).json({
       message: "Task added to event successfully!",
-      eventSchedules: eventSchedules.map((eventTask) => {
+      eventeligiblities: eventeligiblities.map((eventTask) => {
         return eventTask;
       }),
     });
@@ -73,9 +80,9 @@ schRouter.post("/add", async (req, res) => {
   }
 });
 
-// Route for updating Schedules into events
-/* ************** "http://localhost:3000/organization/schedules/update" ***************/
-schRouter.put("/update", async (req, res) => {
+// Route for updating eligiblities into events
+/* ************** "http://localhost:3000/organization/eligiblities/update" ***************/
+elgRouter.put("/update", async (req, res) => {
   const body = req.body;
 
   const eventTask = await prisma.eventManager.update({
@@ -83,14 +90,13 @@ schRouter.put("/update", async (req, res) => {
       id: body.event_id,
     },
     data: {
-      Schedules: {
+      Eligiblities: {
         update: {
           where: {
-            id: body.schedule_id,
+            id: body.eligiblity_id,
           },
           data: {
-            start_time: body.start_time,
-            end_time: body.end_time,
+            e_profession: body.e_profession,
           },
         },
       },
@@ -109,9 +115,9 @@ schRouter.put("/update", async (req, res) => {
   }
 });
 
-// Route for delete Schedules into events
-/* ************** "http://localhost:3000/organization/schedules/delete" ***************/
-schRouter.delete("/delete", async (req, res) => {
+// Route for delete eligiblities into events
+/* ************** "http://localhost:3000/organization/eligiblities/delete" ***************/
+elgRouter.delete("/delete", async (req, res) => {
   const body = req.body;
 
   // you can delete multiple task at time
@@ -120,13 +126,13 @@ schRouter.delete("/delete", async (req, res) => {
       id: body.event_id,
     },
     data: {
-      Schedules: {
-        deleteMany: { id: body.schedule_id },
+      eligiblities: {
+        deleteMany: { id: body.eligiblity_id },
       },
     },
   });
 
-  if (eventSchedules) {
+  if (eventeligiblities) {
     res.status(responseCode.Success).json({
       message: "Schedule deleted successfully!",
       eventTask: eventTask,
@@ -138,4 +144,4 @@ schRouter.delete("/delete", async (req, res) => {
   }
 });
 
-module.exports = { schRouter };
+module.exports = { elgRouter };
