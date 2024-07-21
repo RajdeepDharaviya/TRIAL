@@ -26,6 +26,8 @@ const userData = async (id) => {
   return user;
 };
 
+// Route for getting profile
+/* ************** "http://localhost:3000/user/profile" ***************/
 prfRouter.get("/", async (req, res) => {
   const user = userData(req.userId);
 
@@ -35,6 +37,8 @@ prfRouter.get("/", async (req, res) => {
   });
 });
 
+// Route for updating profile
+/* ************** "http://localhost:3000/user/profile/update" ***************/
 prfRouter.put("/update", async (req, res) => {
   const body = req.body;
 

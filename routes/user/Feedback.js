@@ -53,4 +53,5 @@ fbRouter.post("/write", async (req, res) => {
       .send("Something wrong with server , Please try again after sometime!");
   }
 });
+
 module.exports = { fbRouter };
