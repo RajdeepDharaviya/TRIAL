@@ -3,6 +3,8 @@ const signupRoute = express.Router();
 const { responseCode } = require("../../config");
 const md5 = require("md5");
 const { OrganizersignupSchema } = require("../../middlewares/validation");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 // Route for Signup is
 /* ************** "http://localhost:3000/organization/signup" ***************/
@@ -13,7 +15,7 @@ signupRoute.post("/", async (req, res) => {
   if (OrganizersignupSchema.safeParse(body).success) {
     // Inserting data into the database
 
-    const Organizer = await prisma.Organizer.create({
+    const Organizer = await prisma.organizer.create({
       data: {
         company_name: body.company_name,
         email: body.email,

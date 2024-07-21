@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 eveRouter.use(middlewareOrg);
 
 // For fetching data from database
-const fetchData = async () => {
+const fetchData = async (id) => {
   const event = await prisma.organizer.findUnique({
     where: {
-      orgId: req.userId,
+      orgId: id,
     },
     include: {
       events: {
@@ -27,13 +27,11 @@ const fetchData = async () => {
 /* ************** "http://localhost:3000/organization/events" ***************/
 
 eveRouter.get("/", async (req, res) => {
-  const events = fetchData();
+  const events = fetchData(req.userId);
   if (events) {
     res.status(responseCode.Success).json({
       message: "Event created succesffully!",
-      event: events.map((event) => {
-        return event;
-      }),
+      event: events,
     });
   } else {
     res
@@ -46,19 +44,17 @@ eveRouter.get("/", async (req, res) => {
 /* ************** "http://localhost:3000/organization/events/create" ***************/
 eveRouter.post("/create", async (req, res) => {
   const body = req.body;
-
-  const event = await prisma.organizer.create({
+  console.log(req.userId);
+  const event = await prisma.eventManager.create({
     data: {
-      events: {
-        create: {
-          e_name: body.e_name,
-          e_date: body.e_date,
-          e_description: body.e_description,
-          e_mode: body.e_mode,
-          e_rounds: body.e_rounds,
-          e_type: body.e_type,
-        },
-      },
+      e_name: body.e_name,
+      e_date: body.e_date,
+      e_description: body.e_description,
+      e_mode: body.e_mode,
+      e_rounds: body.e_rounds,
+      e_type: body.e_type,
+      e_fees: body.e_fees,
+      // orgId: req.userId,
     },
   });
 

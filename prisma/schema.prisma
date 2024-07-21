@@ -50,7 +50,7 @@ model EventManager{
   e_type String
   e_mode Boolean
   e_rounds Int
-  e_isAct Boolean
+  e_isAct Boolean @default(true)
   e_fees Float
   orgId Int
   organization Organizer @relation(fields: [orgId],references: [id])
