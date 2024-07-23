@@ -80,7 +80,7 @@ model Venue{
   event_id Int
   event EventManager @relation(fields: [event_id],references: [id])
   v_name String
-  capacity String
+  capacity Int
 }
 
 
