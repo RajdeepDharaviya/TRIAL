@@ -46,7 +46,7 @@ model EventManager{
   id Int @id @default(autoincrement())
   e_name String
   e_description String
-  e_date DateTime
+  e_date DateTime  @default(dbgenerated("(NOW() + '30 days'::interval)"))
   e_type String
   e_mode Boolean
   e_rounds Int
