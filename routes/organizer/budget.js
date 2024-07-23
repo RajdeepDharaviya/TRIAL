@@ -1,6 +1,7 @@
 const express = require("express");
 const { middlewareOrg } = require("../../middlewares/middleware");
 const { PrismaClient } = require("@prisma/client");
+const { responseCode } = require("../../config");
 const budRouter = express.Router();
 const prisma = new PrismaClient();
 
@@ -31,7 +32,7 @@ const fetchEvents = async () => {
 };
 
 // Route for getting tasks of events
-/* ************** "http://localhost:3000/organization/eligiblities" ***************/
+/* ************** "http://localhost:3000/organization/budget" ***************/
 budRouter.get("/", async (req, res) => {
   const events = fetchEvents();
 
@@ -42,37 +43,24 @@ budRouter.get("/", async (req, res) => {
         return event;
       }),
     });
+  } else {
+    res
+      .status(responseCode.InternalServerError)
+      .send("Please try again,After sometime !");
   }
 });
 
 // Route for adding eligiblities into events
-/* ************** "http://localhost:3000/organization/eligiblities/add" ***************/
+/* ************** "http://localhost:3000/organization/budget/add" ***************/
 budRouter.post("/add", async (req, res) => {
   const body = req.body;
 
-  const eventeligiblities = await prisma.eventManager.create({
-    where: {
-      id: body.event_id,
-    },
-    data: {
-      Budgets: {
-        create: {
-          total_budget: body.total_budget,
-        },
-      },
-    },
-    include: {
-      Budgets: true,
-    },
-  });
+  const budget = await prisma.eventManager.create({});
 
-  if (eventeligiblities) {
-    res.status(responseCode.Success).json({
-      message: "Task added to event successfully!",
-      eventeligiblities: eventeligiblities.map((eventTask) => {
-        return eventTask;
-      }),
-    });
+  console.log("budget " + budget);
+
+  if (budget != []) {
+    res.send("done!");
   } else {
     res
       .status(responseCode.InternalServerError)

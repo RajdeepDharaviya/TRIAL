@@ -19,7 +19,7 @@ orgRouter.use("/feedback", fbRouter);
 orgRouter.use("/schedule", schRouter);
 orgRouter.use("/tasks", taskRouter);
 orgRouter.use("/venues", venRouter);
-orgRouter.use("/eligblities", elgRouter);
+orgRouter.use("/eligiblities", elgRouter);
 orgRouter.use("/budget", budRouter);
 
 module.exports = { orgRouter };

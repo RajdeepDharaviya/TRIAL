@@ -1,47 +1,49 @@
 const express = require("express");
 const { middlewareOrg } = require("../../middlewares/middleware");
 const { PrismaClient } = require("@prisma/client");
+const { responseCode } = require("../../config");
 const elgRouter = express.Router();
 const prisma = new PrismaClient();
 
 elgRouter.use(middlewareOrg);
 
 //Getting events from database
-const fetchEvents = async () => {
+const fetchEvents = async (id) => {
   const events = await prisma.organizer.findMany({
     where: {
-      id: req.userId,
+      id: id,
     },
-    include: {
+    select: {
       events: {
         where: {
           e_isAct: true,
         },
         include: {
-          Eligiblities: {
-            select: {
-              id,
-              e_profession,
-            },
-          },
+          Eligiblities: true,
         },
       },
     },
   });
+  console.log(events);
+  return events;
 };
 
 // Route for getting tasks of events
 /* ************** "http://localhost:3000/organization/eligiblities" ***************/
 elgRouter.get("/", async (req, res) => {
-  const events = fetchEvents();
+  const events = fetchEvents(req.userId);
 
-  if (events) {
+  if (events != []) {
     res.status(responseCode.Success).json({
       message: "events given below",
-      events: events.map((event) => {
+      events: (await events).map((event) => {
         return event;
       }),
     });
+  } else {
+    res
+      .status(responseCode.InternalServerError)
+      .send("Something wrong with server, Please try again after sometime!");
   }
 });
 
@@ -50,28 +52,17 @@ elgRouter.get("/", async (req, res) => {
 elgRouter.post("/add", async (req, res) => {
   const body = req.body;
 
-  const eventeligiblities = await prisma.eventManager.create({
-    where: {
-      id: body.event_id,
-    },
+  const eventeligiblities = await prisma.eligiblity.create({
     data: {
-      Eligiblities: {
-        create: {
-          e_profession: body.e_profession,
-        },
-      },
-    },
-    include: {
-      Eligiblities: true,
+      event_id: body.event_id,
+      e_profession: body.e_profession,
     },
   });
 
   if (eventeligiblities) {
     res.status(responseCode.Success).json({
       message: "Task added to event successfully!",
-      eventeligiblities: eventeligiblities.map((eventTask) => {
-        return eventTask;
-      }),
+      eventeligiblities: eventeligiblities,
     });
   } else {
     res
@@ -121,21 +112,21 @@ elgRouter.delete("/delete", async (req, res) => {
   const body = req.body;
 
   // you can delete multiple task at time
-  const eventTask = await prisma.eventManager.update({
+  const eligiblities = await prisma.eventManager.update({
     where: {
       id: body.event_id,
     },
     data: {
-      eligiblities: {
+      Eligiblities: {
         deleteMany: { id: body.eligiblity_id },
       },
     },
   });
 
-  if (eventeligiblities) {
+  if (eligiblities) {
     res.status(responseCode.Success).json({
       message: "Schedule deleted successfully!",
-      eventTask: eventTask,
+      eligiblities: eligiblities,
     });
   } else {
     res
