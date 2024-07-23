@@ -1,31 +1,25 @@
 const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const { middlewareOrg } = require("../../middlewares/middleware");
+const { responseCode } = require("../../config");
 const prfRouter = express.Router();
 const prisma = new PrismaClient();
 prfRouter.use(middlewareOrg);
 
 // Fetching user data from database
 const userData = async (id) => {
-  const user = await prisma.organizer.findFirst({
+  const user = await prisma.organizer.findUnique({
     where: {
       id: id,
     },
-    select: {
-      company_name,
-      contact,
-      email,
-      password,
-    },
   });
-
   return user;
 };
 
 // Route for getting profile
 /* ************** "http://localhost:3000/organization/profile" ***************/
 prfRouter.get("/", async (req, res) => {
-  const user = userData(req.userId);
+  const user = await userData(req.userId);
 
   res.status(responseCode.Success).json({
     message: "Your profile",
@@ -50,10 +44,10 @@ prfRouter.put("/update", async (req, res) => {
     },
   });
 
-  if (userUpdate) {
+  if (userUpdate != []) {
     res.status(responseCode.Success).json({
       message: "Your profile was updated successfully!",
-      user: user,
+      user: userUpdate,
     });
   } else {
     res
