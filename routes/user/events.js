@@ -9,15 +9,23 @@ eveRouter.use(middleware);
 
 // Route for getting all events data
 /* ************** "http://localhost:3000/organization/events" ***************/
-eveRouter.get("/", async (req, res) => {
-  const event = await prisma.eventManager.findMany({
-    where: {},
-  });
+eveRouter.get("/:params", async (req, res) => {
+  const params = req.params.params;
+  let events;
+  if (params == "new") {
+    events = await prisma.eventManager.findMany({
+      where: {
+        e_isAct: true,
+      },
+    });
+  } else {
+    events = await prisma.eventManager.findMany({});
+  }
 
-  if (event) {
+  if (events != []) {
     res.status(responseCode.Success).json({
-      message: "Event created succesffully!",
-      event: event,
+      message: "Events!",
+      events: events,
     });
   } else {
     res
@@ -30,12 +38,21 @@ eveRouter.get("/", async (req, res) => {
 /* ************** "http://localhost:3000/organization/events/participate" ***************/
 eveRouter.get("/participate", async (req, res) => {
   const event = await prisma.eventManager.findMany({
-    where: {},
+    where: {
+      e_isAct: true,
+    },
+    select: {
+      Registers: {
+        where: {
+          user_id: req.userId,
+        },
+      },
+    },
   });
 
-  if (event) {
+  if (event != []) {
     res.status(responseCode.Success).json({
-      message: "Event created succesffully!",
+      message: "Events",
       event: event,
     });
   } else {
@@ -52,9 +69,9 @@ eveRouter.get("/closed", async (req, res) => {
     where: {},
   });
 
-  if (event) {
+  if (event != []) {
     res.status(responseCode.Success).json({
-      message: "Event created succesffully!",
+      message: "Events!",
       event: event,
     });
   } else {

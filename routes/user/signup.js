@@ -7,7 +7,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // Route for Signup is
-/* ************** "http://localhost:3000/admin/signup" ***************/
+/* ************** "http://localhost:3000/user/signup" ***************/
 signupRoute.post("/", async (req, res) => {
   // Getting data from the User
   const body = req.body;

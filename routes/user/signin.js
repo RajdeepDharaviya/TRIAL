@@ -27,8 +27,8 @@ signinRoute.post("/", async (req, res) => {
     if (User != []) {
       const token = jwt.sign(
         {
-          Username: User.email,
-          UserId: User._id,
+          email: User.email,
+          UserId: User.id,
         },
         jwtSecret
       );
