@@ -14,5 +14,14 @@
     "email": "google@gmail.com",
     "password": "12345678",
     "contact": 1234567890
+  },
+  {
+    "e_name": "hakc2win",
+    "e_date": "2011-10-05",
+    "e_description": "This is first test of events endpoints",
+    "e_mode": true,
+    "e_rounds": 3,
+    "e_type": "hackthon",
+    "e_fees": 2000
   }
 ]

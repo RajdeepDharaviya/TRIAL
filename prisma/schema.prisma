@@ -46,11 +46,11 @@ model EventManager{
   id Int @id @default(autoincrement())
   e_name String
   e_description String
-  e_date DateTime
+  e_date DateTime  @default(dbgenerated("(NOW() + '30 days'::interval)"))
   e_type String
   e_mode Boolean
   e_rounds Int
-  e_isAct Boolean
+  e_isAct Boolean @default(true)
   e_fees Float
   orgId Int
   organization Organizer @relation(fields: [orgId],references: [id])
@@ -80,7 +80,7 @@ model Venue{
   event_id Int
   event EventManager @relation(fields: [event_id],references: [id])
   v_name String
-  capacity String
+  capacity Int
 }
 
 
@@ -108,7 +108,7 @@ model Budget{
   id Int @id @default(autoincrement())
   event_id Int
   event EventManager @relation(fields: [event_id],references: [id])
-  total_budget BigInt 
+  total_budget Int
 }
 
 //9

@@ -6,15 +6,15 @@ const middleware = async (req, res, next) => {
   const authorize = req.headers.authorization;
   const data = authorize.split(" ");
   if (authorize && data[0] == "Bearer") {
-    const info = jwt.verify(data[1], "mySecret");
+    const Info = jwt.verify(data[1], "mySecret");
     const verified = await prisma.User.findFirst({
       where: {
-        email: info.email,
+        email: Info.email,
       },
     });
 
     if (verified != []) {
-      req.userId = info.id;
+      req.userId = Info.id;
       next();
     }
   } else {
@@ -26,15 +26,15 @@ const middlewareOrg = async (req, res, next) => {
   const authorize = req.headers.authorization;
   const data = authorize.split(" ");
   if (authorize && data[0] == "Bearer") {
-    const info = jwt.verify(data[1], "mySecret");
-    const verified = await prisma.organizer.findFirst({
+    const Info = jwt.verify(data[1], "mySecret");
+    const verified = await prisma.organizer.findUnique({
       where: {
-        email: info.email,
+        email: Info.email,
       },
     });
 
     if (verified != []) {
-      req.userId = info.id;
+      req.userId = Info.id;
       next();
     }
   } else {

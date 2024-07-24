@@ -2,15 +2,16 @@ const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const { middlewareOrg } = require("../../middlewares/middleware");
 const venRouter = express.Router();
+const { responseCode } = require("../../config");
 const prisma = new PrismaClient();
 
 venRouter.use(middlewareOrg);
 
 //Getting events from database
-const fetchEvents = async () => {
-  const events = await prisma.organizer.findMany({
+const fetchEvents = async (id) => {
+  const events = await prisma.organizer.findUnique({
     where: {
-      id: req.userId,
+      id: id,
     },
     include: {
       events: {
@@ -18,31 +19,29 @@ const fetchEvents = async () => {
           e_isAct: true,
         },
         include: {
-          Venues: {
-            select: {
-              v_name,
-              id,
-              capacity,
-            },
-          },
+          Venues: true,
         },
       },
     },
   });
+
+  return events;
 };
 
-// Route for getting tasks of events
+// Route for getting venues of events
 /* ************** "http://localhost:3000/organization/venues" ***************/
 venRouter.get("/", async (req, res) => {
-  const events = fetchEvents();
+  const events = await fetchEvents(req.userId);
 
-  if (events) {
+  if (events != []) {
     res.status(responseCode.Success).json({
       message: "events given below",
-      events: events.map((event) => {
-        return event;
-      }),
+      events: events,
     });
+  } else {
+    res
+      .status(responseCode.InternalServerError)
+      .send("Something wrong with server , Please try again after sometime!");
   }
 });
 
@@ -51,29 +50,18 @@ venRouter.get("/", async (req, res) => {
 venRouter.post("/add", async (req, res) => {
   const body = req.body;
 
-  const eventvenues = await prisma.eventManager.create({
-    where: {
-      id: body.event_id,
-    },
+  const eventvenues = await prisma.venue.create({
     data: {
-      Venues: {
-        create: {
-          v_name: body.v_name,
-          capacity: body.capacity,
-        },
-      },
-    },
-    include: {
-      venues: true,
+      event_id: body.event_id,
+      v_name: body.v_name,
+      capacity: body.capacity,
     },
   });
 
-  if (eventvenues) {
+  if (eventvenues != []) {
     res.status(responseCode.Success).json({
-      message: "Task added to event successfully!",
-      eventvenues: eventvenues.map((eventTask) => {
-        return eventTask;
-      }),
+      message: "Events venues ",
+      eventvenues: eventvenues,
     });
   } else {
     res
@@ -87,29 +75,21 @@ venRouter.post("/add", async (req, res) => {
 venRouter.put("/update", async (req, res) => {
   const body = req.body;
 
-  const eventTask = await prisma.eventManager.update({
+  const eventvenue = await prisma.venue.update({
     where: {
-      id: body.event_id,
+      event_id: body.event_id,
+      id: body.venue_id,
     },
     data: {
-      Venues: {
-        update: {
-          where: {
-            id: body.veneu_id,
-          },
-          data: {
-            v_name: body.v_name,
-            capacity: body.capacity,
-          },
-        },
-      },
+      v_name: body.v_name,
+      capacity: body.capacity,
     },
   });
 
-  if (eventTask) {
+  if (eventvenue != []) {
     res.status(responseCode.Success).json({
-      message: "Schedule updated successfully!",
-      eventTask: eventTask,
+      message: "Venue updated successfully!",
+      eventvenue: eventvenue,
     });
   } else {
     res
@@ -123,22 +103,22 @@ venRouter.put("/update", async (req, res) => {
 venRouter.delete("/delete", async (req, res) => {
   const body = req.body;
 
-  // you can delete multiple task at time
-  const eventTask = await prisma.eventManager.update({
+  // you can delete multiple venue at time
+  const eventvenue = await prisma.eventManager.update({
     where: {
       id: body.event_id,
     },
     data: {
-      venues: {
+      Venues: {
         deleteMany: { id: body.veneu_id },
       },
     },
   });
 
-  if (eventvenues) {
+  if (eventvenue != []) {
     res.status(responseCode.Success).json({
-      message: "Schedule deleted successfully!",
-      eventTask: eventTask,
+      message: "Venue deleted successfully!",
+      eventvenue: eventvenue,
     });
   } else {
     res

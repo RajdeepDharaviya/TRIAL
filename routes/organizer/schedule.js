@@ -1,39 +1,47 @@
 const express = require("express");
 const { middlewareOrg } = require("../../middlewares/middleware");
 const { PrismaClient } = require("@prisma/client");
+const { responseCode } = require("../../config");
 const schRouter = express.Router();
 const prisma = new PrismaClient();
 
 schRouter.use(middlewareOrg);
 
 //Getting events from database
-const fetchEvents = async () => {
+const fetchEvents = async (id) => {
   const events = await prisma.organizer.findMany({
     where: {
-      id: req.userId,
+      id: id,
     },
     include: {
       events: {
         where: {
           e_isAct: true,
         },
+        include: {
+          Schedules: true,
+        },
       },
     },
   });
+
+  return events;
 };
 
 // Route for getting Schedules of events
 /* ************** "http://localhost:3000/organization/schedules" ***************/
 schRouter.get("/", async (req, res) => {
-  const events = fetchEvents();
+  const events = await fetchEvents(req.userId);
 
-  if (events) {
+  if (events != []) {
     res.status(responseCode.Success).json({
       message: "events given below",
-      events: events.map((event) => {
-        return event;
-      }),
+      events: events,
     });
+  } else {
+    res
+      .status(responseCode.InternalServerError)
+      .send("Something wrong with server , Please try again after sometime!");
   }
 });
 
@@ -42,29 +50,18 @@ schRouter.get("/", async (req, res) => {
 schRouter.post("/add", async (req, res) => {
   const body = req.body;
 
-  const eventSchedules = await prisma.eventManager.create({
-    where: {
-      id: body.event_id,
-    },
+  const eventSchedules = await prisma.schedule.create({
     data: {
-      Schedules: {
-        create: {
-          start_time: body.start_time,
-          end_time: body.end_time,
-        },
-      },
-    },
-    include: {
-      Schedules: true,
+      start_time: body.start_time,
+      end_time: body.end_time,
+      event_id: body.event_id,
     },
   });
 
-  if (eventSchedules) {
+  if (eventSchedules != []) {
     res.status(responseCode.Success).json({
       message: "Task added to event successfully!",
-      eventSchedules: eventSchedules.map((eventTask) => {
-        return eventTask;
-      }),
+      eventSchedules: eventSchedules,
     });
   } else {
     res
@@ -78,26 +75,18 @@ schRouter.post("/add", async (req, res) => {
 schRouter.put("/update", async (req, res) => {
   const body = req.body;
 
-  const eventTask = await prisma.eventManager.update({
+  const eventTask = await prisma.schedule.update({
     where: {
-      id: body.event_id,
+      event_id: body.event_id,
+      id: body.schedule_id,
     },
     data: {
-      Schedules: {
-        update: {
-          where: {
-            id: body.schedule_id,
-          },
-          data: {
-            start_time: body.start_time,
-            end_time: body.end_time,
-          },
-        },
-      },
+      start_time: body.start_time,
+      end_time: body.end_time,
     },
   });
 
-  if (eventTask) {
+  if (eventTask != []) {
     res.status(responseCode.Success).json({
       message: "Schedule updated successfully!",
       eventTask: eventTask,
@@ -115,7 +104,7 @@ schRouter.delete("/delete", async (req, res) => {
   const body = req.body;
 
   // you can delete multiple task at time
-  const eventTask = await prisma.eventManager.update({
+  const eventSchedules = await prisma.eventManager.update({
     where: {
       id: body.event_id,
     },
@@ -126,10 +115,10 @@ schRouter.delete("/delete", async (req, res) => {
     },
   });
 
-  if (eventSchedules) {
+  if (eventSchedules != []) {
     res.status(responseCode.Success).json({
       message: "Schedule deleted successfully!",
-      eventTask: eventTask,
+      eventSchedules: eventSchedules,
     });
   } else {
     res

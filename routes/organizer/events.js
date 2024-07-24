@@ -7,12 +7,13 @@ const prisma = new PrismaClient();
 eveRouter.use(middlewareOrg);
 
 // For fetching data from database
-const fetchData = async () => {
-  const event = await prisma.organizer.findUnique({
+const fetchData = async (id) => {
+  const event = await prisma.organizer.findMany({
     where: {
-      orgId: req.userId,
+      id: id,
     },
-    include: {
+    select: {
+      id,
       events: {
         where: {
           e_isAct: true,
@@ -27,13 +28,12 @@ const fetchData = async () => {
 /* ************** "http://localhost:3000/organization/events" ***************/
 
 eveRouter.get("/", async (req, res) => {
-  const events = fetchData();
-  if (events) {
+  const events = await fetchData(req.userId);
+
+  if (events != []) {
     res.status(responseCode.Success).json({
-      message: "Event created succesffully!",
-      event: events.map((event) => {
-        return event;
-      }),
+      message: "Events!",
+      event: events,
     });
   } else {
     res
@@ -46,19 +46,16 @@ eveRouter.get("/", async (req, res) => {
 /* ************** "http://localhost:3000/organization/events/create" ***************/
 eveRouter.post("/create", async (req, res) => {
   const body = req.body;
-
-  const event = await prisma.organizer.create({
+  const event = await prisma.eventManager.create({
     data: {
-      events: {
-        create: {
-          e_name: body.e_name,
-          e_date: body.e_date,
-          e_description: body.e_description,
-          e_mode: body.e_mode,
-          e_rounds: body.e_rounds,
-          e_type: body.e_type,
-        },
-      },
+      e_name: body.e_name,
+      e_description: body.e_description,
+      e_mode: body.e_mode,
+      e_rounds: body.e_rounds,
+      e_type: body.e_type,
+      e_fees: body.e_fees,
+      e_isAct: true,
+      orgId: req.userId,
     },
   });
 
@@ -82,7 +79,7 @@ eveRouter.put("/update", async (req, res) => {
   //getting an events details first for any updates to the events
   const events = fetchData();
 
-  const event = await prisma.user.update({
+  const event = await prisma.eventManager.update({
     where: {
       orgId: req.userId,
       id: body.eventId,
@@ -91,11 +88,11 @@ eveRouter.put("/update", async (req, res) => {
     // For example , u can update only name or all the above data
     data: {
       e_name: body.e_name,
-      e_date: body.e_date,
       e_description: body.e_description,
       e_mode: body.e_mode,
       e_rounds: body.e_rounds,
       e_type: body.e_type,
+      e_fees: body.e_fees,
     },
   });
 
