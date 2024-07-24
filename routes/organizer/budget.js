@@ -8,10 +8,10 @@ const prisma = new PrismaClient();
 budRouter.use(middlewareOrg);
 
 //Getting events from database
-const fetchEvents = async () => {
+const fetchEvents = async (id) => {
   const events = await prisma.organizer.findMany({
     where: {
-      id: req.userId,
+      id: id,
     },
     include: {
       events: {
@@ -19,24 +19,20 @@ const fetchEvents = async () => {
           e_isAct: true,
         },
         include: {
-          Budgets: {
-            select: {
-              id,
-              total_budget,
-            },
-          },
+          Budgets: true,
         },
       },
     },
   });
+  return events;
 };
 
 // Route for getting tasks of events
 /* ************** "http://localhost:3000/organization/budget" ***************/
 budRouter.get("/", async (req, res) => {
-  const events = fetchEvents();
+  const events = await fetchEvents(req.userId);
 
-  if (events) {
+  if (events != []) {
     res.status(responseCode.Success).json({
       message: "events given below",
       events: events.map((event) => {
@@ -55,9 +51,12 @@ budRouter.get("/", async (req, res) => {
 budRouter.post("/add", async (req, res) => {
   const body = req.body;
 
-  const budget = await prisma.eventManager.create({});
-
-  console.log("budget " + budget);
+  const budget = await prisma.budget.create({
+    data: {
+      event_id: body.event_id,
+      total_budget: body.total_budget,
+    },
+  });
 
   if (budget != []) {
     res.send("done!");
@@ -69,29 +68,21 @@ budRouter.post("/add", async (req, res) => {
 });
 
 // Route for updating eligiblities into events
-/* ************** "http://localhost:3000/organization/eligiblities/update" ***************/
+/* ************** "http://localhost:3000/organization/budget/update" ***************/
 budRouter.put("/update", async (req, res) => {
   const body = req.body;
 
-  const eventTask = await prisma.eventManager.update({
+  const eventTask = await prisma.budget.update({
     where: {
-      id: body.event_id,
+      event_id: body.event_id,
+      id: body.budget_id,
     },
     data: {
-      Budgets: {
-        update: {
-          where: {
-            id: body.budget_id,
-          },
-          data: {
-            total_budget: body.total_budget,
-          },
-        },
-      },
+      total_budget: body.total_budget,
     },
   });
 
-  if (eventTask) {
+  if (eventTask != []) {
     res.status(responseCode.Success).json({
       message: "Schedule updated successfully!",
       eventTask: eventTask,
@@ -104,7 +95,7 @@ budRouter.put("/update", async (req, res) => {
 });
 
 // Route for delete eligiblities into events
-/* ************** "http://localhost:3000/organization/eligiblities/delete" ***************/
+/* ************** "http://localhost:3000/organization/budget/delete" ***************/
 budRouter.delete("/delete", async (req, res) => {
   const body = req.body;
 
@@ -120,7 +111,7 @@ budRouter.delete("/delete", async (req, res) => {
     },
   });
 
-  if (eventTask) {
+  if (eventTask != []) {
     res.status(responseCode.Success).json({
       message: "Schedule deleted successfully!",
       eventTask: eventTask,
