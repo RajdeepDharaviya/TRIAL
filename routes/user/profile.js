@@ -12,24 +12,15 @@ const userData = async (id) => {
     where: {
       id: id,
     },
-    select: {
-      email,
-      contact,
-      age,
-      firstname,
-      lastname,
-      password,
-      profession,
-    },
   });
 
   return user;
 };
 
 // Route for getting profile
-/* ************** "http://localhost:3000/user/profile" ***************/
+/* ************** "http://localhost:3000/user/" ***************/
 prfRouter.get("/", async (req, res) => {
-  const user = userData(req.userId);
+  const user = await userData(req.userId);
 
   res.status(responseCode.Success).json({
     message: "Your profile",
@@ -57,10 +48,10 @@ prfRouter.put("/update", async (req, res) => {
     },
   });
 
-  if (userUpdate) {
+  if (userUpdate != []) {
     res.status(responseCode.Success).json({
       message: "Your profile was updated successfully!",
-      user: user,
+      user: userUpdate,
     });
   } else {
     res

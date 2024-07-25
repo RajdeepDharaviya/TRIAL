@@ -18,8 +18,10 @@ eveRouter.get("/:params", async (req, res) => {
         e_isAct: true,
       },
     });
-  } else {
-    events = await prisma.eventManager.findMany({});
+  } else if (params == "closed") {
+    events = await prisma.eventManager.findMany({
+      where: { e_isAct: false },
+    });
   }
 
   if (events != []) {
@@ -53,25 +55,6 @@ eveRouter.get("/participate", async (req, res) => {
   if (event != []) {
     res.status(responseCode.Success).json({
       message: "Events",
-      event: event,
-    });
-  } else {
-    res
-      .status(responseCode.InternalServerError)
-      .send("Something wrong with server, Please try again after sometime!");
-  }
-});
-
-// Route for getting all events data
-/* ************** "http://localhost:3000/organization/events/closed" ***************/
-eveRouter.get("/closed", async (req, res) => {
-  const event = await prisma.eventManager.findMany({
-    where: {},
-  });
-
-  if (event != []) {
-    res.status(responseCode.Success).json({
-      message: "Events!",
       event: event,
     });
   } else {

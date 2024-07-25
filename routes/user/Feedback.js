@@ -10,12 +10,19 @@ fbRouter.use(middleware);
 // Route for getting feedback
 /* ************** "http://localhost:3000/user/feedback/" ***************/
 fbRouter.get("/", async (req, res) => {
-  const feedbacks = await prisma.feedback.findMany({
+  const feedbacks = await prisma.eventManager.findMany({
     where: {
-      user_id: req.userId,
+      feedbacks: {
+        some: {
+          user_id: req.userId,
+        },
+      },
+    },
+    include: {
+      feedbacks: true,
     },
   });
-  if (feedback != []) {
+  if (feedbacks != []) {
     res.status(responseCode.Success).json({
       message: "Feedbacks",
       feedback: feedbacks.map((feedback) => {
@@ -33,7 +40,7 @@ fbRouter.get("/", async (req, res) => {
 /* ************** "http://localhost:3000/user/feedback/write" ***************/
 fbRouter.post("/write", async (req, res) => {
   const body = req.body;
-  const feedback = await prisma.feedback.findMany({
+  const feedback = await prisma.feedback.create({
     data: {
       suggestions: body.suggestions,
       experience: body.experience,
