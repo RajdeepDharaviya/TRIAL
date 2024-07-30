@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const { middlewareOrg } = require("../../middlewares/middleware");
 const { responseCode } = require("../../config");
+const md5 = require("md5");
 const prfRouter = express.Router();
 const prisma = new PrismaClient();
 prfRouter.use(middlewareOrg);
@@ -11,6 +12,11 @@ const userData = async (id) => {
   const user = await prisma.organizer.findUnique({
     where: {
       id: id,
+    },
+    select: {
+      company_name: true,
+      email: true,
+      contact: true,
     },
   });
   return user;
@@ -38,13 +44,13 @@ prfRouter.put("/update", async (req, res) => {
     },
     data: {
       company_name: body.company_name,
-      password: body.password,
+      password: md5(body.password),
       contact: body.contact,
       email: body.email,
     },
   });
 
-  if (userUpdate != []) {
+  if (userUpdate != null) {
     res.status(responseCode.Success).json({
       message: "Your profile was updated successfully!",
       user: userUpdate,

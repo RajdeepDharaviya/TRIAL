@@ -8,16 +8,45 @@ const eveRouter = express.Router();
 eveRouter.use(middleware);
 
 // Route for getting all events data
-/* ************** "http://localhost:3000/organization/events" ***************/
-eveRouter.get("/", async (req, res) => {
-  const event = await prisma.eventManager.findMany({
-    where: {},
-  });
+/* ************** "http://localhost:3000/user/events" ***************/
+eveRouter.get("/:params", async (req, res) => {
+  const params = req.params.params;
+  let events;
+  if (params == "new") {
+    events = await prisma.eventManager.findMany({
+      where: {
+        e_isAct: true,
+      },
+    });
+  } else if (params == "closed") {
+    events = await prisma.eventManager.findMany({
+      where: { e_isAct: false },
+    });
+  } else if (params == "participate") {
+    events = await prisma.eventManager.findMany({
+      where: {
+        e_isAct: true,
+      },
+      select: {
+        e_date: true,
+        e_name: true,
+        e_description: true,
+        e_mode: true,
+        e_rounds: true,
+        e_fees: true,
+        Registers: {
+          where: {
+            user_id: req.userId,
+          },
+        },
+      },
+    });
+  }
 
-  if (event) {
+  if (events != []) {
     res.status(responseCode.Success).json({
-      message: "Event created succesffully!",
-      event: event,
+      message: "Events!",
+      events: events,
     });
   } else {
     res
@@ -27,34 +56,25 @@ eveRouter.get("/", async (req, res) => {
 });
 
 // Route for getting all events data
-/* ************** "http://localhost:3000/organization/events/participate" ***************/
+/* ************** "http://localhost:3000/user/events/participate" ***************/
 eveRouter.get("/participate", async (req, res) => {
+  console.log("Hi tehre");
   const event = await prisma.eventManager.findMany({
-    where: {},
+    where: {
+      e_isAct: true,
+    },
+    select: {
+      Registers: {
+        where: {
+          user_id: req.userId,
+        },
+      },
+    },
   });
-
-  if (event) {
+  console.log("hi " + event);
+  if (event != []) {
     res.status(responseCode.Success).json({
-      message: "Event created succesffully!",
-      event: event,
-    });
-  } else {
-    res
-      .status(responseCode.InternalServerError)
-      .send("Something wrong with server, Please try again after sometime!");
-  }
-});
-
-// Route for getting all events data
-/* ************** "http://localhost:3000/organization/events/closed" ***************/
-eveRouter.get("/closed", async (req, res) => {
-  const event = await prisma.eventManager.findMany({
-    where: {},
-  });
-
-  if (event) {
-    res.status(responseCode.Success).json({
-      message: "Event created succesffully!",
+      message: "Events",
       event: event,
     });
   } else {

@@ -2,19 +2,30 @@ const express = require("express");
 const { middlewareOrg } = require("../../middlewares/middleware");
 const fbRouter = express.Router();
 const { PrismaClient } = require("@prisma/client");
+const { responseCode } = require("../../config");
 const prisma = new PrismaClient();
 
 fbRouter.use(middlewareOrg);
 
 // Route for getting feedback
-/* ************** "http://localhost:3000/user/feedback/" ***************/
+/* ************** "http://localhost:3000/organization/feedback/" ***************/
 fbRouter.get("/", async (req, res) => {
-  const feedbacks = await prisma.feedback.findMany({
+  const feedbacks = await prisma.eventManager.findMany({
     where: {
-      user_id: req.userId,
+      orgId: req.userId,
+    },
+    select: {
+      e_name: true,
+      feedbacks: {
+        select: {
+          suggestions: true,
+          experience: true,
+          rating: true,
+        },
+      },
     },
   });
-  if (feedback != []) {
+  if (feedbacks != null) {
     res.status(responseCode.Success).json({
       message: "Feedbacks",
       feedback: feedbacks.map((feedback) => {
@@ -27,4 +38,5 @@ fbRouter.get("/", async (req, res) => {
       .send("Something wrong with server , Please try again after sometime!");
   }
 });
+
 module.exports = { fbRouter };

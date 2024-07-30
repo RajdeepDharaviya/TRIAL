@@ -24,16 +24,16 @@ const fetchEvents = async (id) => {
       },
     },
   });
-  console.log(events);
+
   return events;
 };
 
-// Route for getting tasks of events
+// Route for getting eligibilities
 /* ************** "http://localhost:3000/organization/eligiblities" ***************/
 elgRouter.get("/", async (req, res) => {
   const events = fetchEvents(req.userId);
 
-  if (events != []) {
+  if (events != null) {
     res.status(responseCode.Success).json({
       message: "events given below",
       events: (await events).map((event) => {
@@ -98,35 +98,6 @@ elgRouter.put("/update", async (req, res) => {
     res.status(responseCode.Success).json({
       message: "Schedule updated successfully!",
       eventTask: eventTask,
-    });
-  } else {
-    res
-      .status(responseCode.InternalServerError)
-      .send("Something wrong with server , Please try again after sometime!");
-  }
-});
-
-// Route for delete eligiblities into events
-/* ************** "http://localhost:3000/organization/eligiblities/delete" ***************/
-elgRouter.delete("/delete", async (req, res) => {
-  const body = req.body;
-
-  // you can delete multiple task at time
-  const eligiblities = await prisma.eventManager.update({
-    where: {
-      id: body.event_id,
-    },
-    data: {
-      Eligiblities: {
-        deleteMany: { id: body.eligiblity_id },
-      },
-    },
-  });
-
-  if (eligiblities) {
-    res.status(responseCode.Success).json({
-      message: "Schedule deleted successfully!",
-      eligiblities: eligiblities,
     });
   } else {
     res

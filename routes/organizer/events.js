@@ -30,7 +30,7 @@ const fetchData = async (id) => {
 eveRouter.get("/", async (req, res) => {
   const events = await fetchData(req.userId);
 
-  if (events != []) {
+  if (events != null) {
     res.status(responseCode.Success).json({
       message: "Events!",
       event: events,
@@ -59,7 +59,7 @@ eveRouter.post("/create", async (req, res) => {
     },
   });
 
-  if (event) {
+  if (event != null) {
     res.status(responseCode.Success).json({
       message: "Event created succesffully!",
       event: event,
@@ -79,7 +79,7 @@ eveRouter.put("/update", async (req, res) => {
   //getting an events details first for any updates to the events
   const events = fetchData();
 
-  const event = await prisma.eventManager.update({
+  const event = await prisma.eventManager.updateMany({
     where: {
       orgId: req.userId,
       id: body.eventId,
@@ -96,7 +96,7 @@ eveRouter.put("/update", async (req, res) => {
     },
   });
 
-  if (event) {
+  if (event != null) {
     res.status(responseCode.Success).json({
       message: "Event updated succesffully!",
       event: event,
@@ -128,7 +128,7 @@ eveRouter.put("/cancel", async (req, res) => {
     },
   });
 
-  if (event) {
+  if (event != null) {
     res.status(responseCode.Success).json({
       message: "Event updated succesffully!",
       event: event,

@@ -22,6 +22,17 @@ attRouter.get("/", async (req, res) => {
       },
     },
   });
+
+  if (attendee != null) {
+    res.status(responseCode.Success).json({
+      message: "total attendee",
+      attendee: attendee,
+    });
+  } else {
+    res
+      .status(responseCode.InternalServerError)
+      .send("Something wrong with server , Please try again after sometime!");
+  }
 });
 
 // Route for getting particular count
@@ -38,18 +49,29 @@ attRouter.get("/participants", async (req, res) => {
           id,
           user: {
             select: {
-              firstname,
-              lastname,
-              contact,
-              email,
-              age,
-              profession,
+              firstname: true,
+              lastname: true,
+              contact: true,
+              email: true,
+              age: true,
+              profession: true,
             },
           },
         },
       },
     },
   });
+
+  if (attendee != null) {
+    res.status(responseCode.Success).json({
+      message: "total attendee",
+      attendee: attendee,
+    });
+  } else {
+    res
+      .status(responseCode.InternalServerError)
+      .send("Something wrong with server , Please try again after sometime!");
+  }
 });
 
 module.exports = { attRouter };

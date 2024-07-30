@@ -32,7 +32,7 @@ const fetchEvents = async (id) => {
 taskRouter.get("/", async (req, res) => {
   const events = await fetchEvents(req.userId);
 
-  if (events != []) {
+  if (events != null) {
     res.status(responseCode.Success).json({
       message: "events given below",
       events: events,
@@ -58,7 +58,7 @@ taskRouter.post("/add", async (req, res) => {
       }),
     });
     //   }
-    if (eventTasks != []) {
+    if (eventTasks != null) {
       res.status(responseCode.Success).json({
         message: "Task added to event successfully!",
         eventTasks: eventTasks,
@@ -81,7 +81,7 @@ taskRouter.put("/update", async (req, res) => {
   const body = req.body;
 
   // We can update multiple task at time
-  let eventTask = [];
+  let eventTask = null;
   for (let i = 0; i < body.ids.length; i++) {
     eventTask = await prisma.eventManager.update({
       where: {
@@ -100,40 +100,9 @@ taskRouter.put("/update", async (req, res) => {
     });
   }
 
-  if (eventTask != []) {
+  if (eventTask != null) {
     res.status(responseCode.Success).json({
       message: "Task updated successfully!",
-      eventTask: eventTask,
-    });
-  } else {
-    res
-      .status(responseCode.InternalServerError)
-      .send("Something wrong with server , Please try again after sometime!");
-  }
-});
-
-// Route for delete tasks into events
-/* ************** "http://localhost:3000/organization/tasks/delete" ***************/
-taskRouter.delete("/delete", async (req, res) => {
-  const body = req.body;
-
-  // you can delete multiple task at time
-  const eventTask = await prisma.eventManager.update({
-    where: {
-      id: body.event_id,
-    },
-    data: {
-      Tasks: {
-        deleteMany: body.tasks.map((task_id) => {
-          return { id: task_id };
-        }),
-      },
-    },
-  });
-  //   }
-  if (eventTask != []) {
-    res.status(responseCode.Success).json({
-      message: "Task deleted successfully!",
       eventTask: eventTask,
     });
   } else {

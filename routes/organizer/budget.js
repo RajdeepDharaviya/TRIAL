@@ -32,7 +32,7 @@ const fetchEvents = async (id) => {
 budRouter.get("/", async (req, res) => {
   const events = await fetchEvents(req.userId);
 
-  if (events != []) {
+  if (events != null) {
     res.status(responseCode.Success).json({
       message: "events given below",
       events: events.map((event) => {
@@ -58,7 +58,7 @@ budRouter.post("/add", async (req, res) => {
     },
   });
 
-  if (budget != []) {
+  if (budget != null) {
     res.send("done!");
   } else {
     res
@@ -82,38 +82,9 @@ budRouter.put("/update", async (req, res) => {
     },
   });
 
-  if (eventTask != []) {
+  if (eventTask != null) {
     res.status(responseCode.Success).json({
       message: "Schedule updated successfully!",
-      eventTask: eventTask,
-    });
-  } else {
-    res
-      .status(responseCode.InternalServerError)
-      .send("Something wrong with server , Please try again after sometime!");
-  }
-});
-
-// Route for delete eligiblities into events
-/* ************** "http://localhost:3000/organization/budget/delete" ***************/
-budRouter.delete("/delete", async (req, res) => {
-  const body = req.body;
-
-  // you can delete multiple task at time
-  const eventTask = await prisma.eventManager.update({
-    where: {
-      id: body.event_id,
-    },
-    data: {
-      Budgets: {
-        deleteMany: { id: body.budget_id },
-      },
-    },
-  });
-
-  if (eventTask != []) {
-    res.status(responseCode.Success).json({
-      message: "Schedule deleted successfully!",
       eventTask: eventTask,
     });
   } else {

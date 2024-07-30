@@ -14,128 +14,114 @@ datasource db {
 }
 
 //1
-model Organizer{
-  id Int @id @default(autoincrement())
+model Organizer {
+  id           Int            @id @default(autoincrement())
   company_name String
-  email String @unique
-  password String 
-  contact Decimal
-  isAct Boolean @default(true)
-  events EventManager[]
+  email        String         @unique
+  password     String
+  contact      Decimal
+  isAct        Boolean        @default(true)
+  events       EventManager[]
 }
 
-
 //2
-model User{
-  id Int @id @default(autoincrement())
-  firstname String 
-  lastname String
-  email String @unique
-  password String 
-  age Int
-  profession String 
-  contact Decimal
-  isAct Boolean @default(true)
-  Attendance Attendee[]
+model User {
+  id         Int     @id @default(autoincrement())
+  firstname  String
+  lastname   String
+  email      String  @unique
+  password   String
+  age        Int
+  profession String
+  contact    Decimal
+  isAct      Boolean @default(true)
+
   Registers TotalRegisters[]
   feedbacks Feedback[]
 }
 
 //3
-model EventManager{
-  id Int @id @default(autoincrement())
-  e_name String
+model EventManager {
+  id            Int       @id @default(autoincrement())
+  e_name        String
   e_description String
-  e_date DateTime  @default(dbgenerated("(NOW() + '30 days'::interval)"))
-  e_type String
-  e_mode Boolean
-  e_rounds Int
-  e_isAct Boolean @default(true)
-  e_fees Float
-  orgId Int
-  organization Organizer @relation(fields: [orgId],references: [id])
-  Attendance Attendee[]
-  Tasks Task[]
-  Schedules Schedule[]
-  Budgets Budget[]
+  e_date        DateTime  @default(dbgenerated("(NOW() + '30 days'::interval)"))
+  e_type        String
+  e_mode        Boolean
+  e_rounds      Int
+  e_isAct       Boolean   @default(true)
+  e_fees        Float
+  orgId         Int
+  organization  Organizer @relation(fields: [orgId], references: [id])
+
+  Tasks        Task[]
+  Schedules    Schedule[]
+  Budgets      Budget[]
   Eligiblities Eligiblity[]
-  Venues Venue[]
-  Registers TotalRegisters[]
-  feedbacks Feedback[]
+  Venues       Venue[]
+  Registers    TotalRegisters[]
+  feedbacks    Feedback[]
 }
-
-//4
-model Attendee{
-  id Int @id @default(autoincrement())
-  event_id Int
-  event EventManager @relation(fields: [event_id],references: [id])
-  user_id Int
-  user User @relation(fields: [user_id],references: [id])
-}
-
 
 //5
-model Venue{
-  id Int @id @default(autoincrement())
+model Venue {
+  id       Int          @id @default(autoincrement())
   event_id Int
-  event EventManager @relation(fields: [event_id],references: [id])
-  v_name String
+  event    EventManager @relation(fields: [event_id], references: [id])
+  v_name   String
   capacity Int
 }
 
-
 //6
-model Task{
-  id Int @id @default(autoincrement())
-  t_name String
+model Task {
+  id       Int          @id @default(autoincrement())
+  t_name   String
   event_id Int
-  event EventManager @relation(fields: [event_id],references: [id])
+  event    EventManager @relation(fields: [event_id], references: [id])
 }
-
 
 //7
-model Schedule{
-  id Int @id @default(autoincrement())
-  event_id Int
-  event EventManager @relation(fields: [event_id],references: [id])
+model Schedule {
+  id         Int          @id @default(autoincrement())
+  event_id   Int
+  event      EventManager @relation(fields: [event_id], references: [id])
   start_time DateTime
-  end_time DateTime
+  end_time   DateTime
 }
 
-
 //8
-model Budget{
-  id Int @id @default(autoincrement())
-  event_id Int
-  event EventManager @relation(fields: [event_id],references: [id])
+model Budget {
+  id           Int          @id @default(autoincrement())
+  event_id     Int
+  event        EventManager @relation(fields: [event_id], references: [id])
   total_budget Int
 }
 
 //9
-model Eligiblity{
-  id Int @id @default(autoincrement())
+model Eligiblity {
+  id           Int          @id @default(autoincrement())
   e_profession String
-  event_id Int
-  event EventManager @relation(fields: [event_id],references: [id])
+  event_id     Int
+  event        EventManager @relation(fields: [event_id], references: [id])
 }
 
 //10
-model TotalRegisters{
-  id Int @id @default(autoincrement())
+model TotalRegisters {
+  id      Int           @id @default(autoincrement())
   even_id Int
-  event EventManager @relation(fields: [even_id],references: [id])
+  event   EventManager? @relation(fields: [even_id], references: [id])
   user_id Int
-  user User @relation(fields: [user_id],references: [id])
+  user    User?         @relation(fields: [user_id], references: [id])
 }
 
 //11
-model Feedback{
-  id Int @id @default(autoincrement())
-  even_id Int
-  event EventManager @relation(fields: [even_id],references: [id])
-  user_id Int
-  user User @relation(fields: [user_id],references: [id])
+model Feedback {
+  id          Int          @id @default(autoincrement())
+  even_id     Int
+  event       EventManager @relation(fields: [even_id], references: [id])
+  user_id     Int
+  user        User         @relation(fields: [user_id], references: [id])
   suggestions String
-  experience String
-  rating Int
+  experience  String
+  rating      Int
 }
