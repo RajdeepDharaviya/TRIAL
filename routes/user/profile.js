@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const { middleware } = require("../../middlewares/middleware");
 const { responseCode } = require("../../config");
+const md5 = require("md5");
 const prfRouter = express.Router();
 const prisma = new PrismaClient();
 prfRouter.use(middleware);
@@ -11,6 +12,14 @@ const userData = async (id) => {
   const user = await prisma.user.findFirst({
     where: {
       id: id,
+    },
+    select: {
+      firstname: true,
+      lastname: true,
+      email: true,
+      contact: true,
+      age: true,
+      profession: true,
     },
   });
 
@@ -40,11 +49,10 @@ prfRouter.put("/update", async (req, res) => {
     data: {
       age: body.age,
       profession: body.profession,
-      password: body.password,
+      password: md5(body.password),
       firstname: body.firstname,
       lastname: body.lastname,
       contact: body.contact,
-      email: body.email,
     },
   });
 

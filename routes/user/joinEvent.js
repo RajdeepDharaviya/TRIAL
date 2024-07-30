@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 joinRouter.use(middleware);
 
-// Route for getting all events data
+// Route for joining all events data
 /* ************** "http://localhost:3000/user/join/event" ***************/
 joinRouter.post("/event", async (req, res) => {
   const body = req.body;

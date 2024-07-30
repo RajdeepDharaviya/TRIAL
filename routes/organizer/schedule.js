@@ -33,7 +33,7 @@ const fetchEvents = async (id) => {
 schRouter.get("/", async (req, res) => {
   const events = await fetchEvents(req.userId);
 
-  if (events != []) {
+  if (events != null) {
     res.status(responseCode.Success).json({
       message: "events given below",
       events: events,
@@ -58,7 +58,7 @@ schRouter.post("/add", async (req, res) => {
     },
   });
 
-  if (eventSchedules != []) {
+  if (eventSchedules != null) {
     res.status(responseCode.Success).json({
       message: "Task added to event successfully!",
       eventSchedules: eventSchedules,
@@ -86,7 +86,7 @@ schRouter.put("/update", async (req, res) => {
     },
   });
 
-  if (eventTask != []) {
+  if (eventTask != null) {
     res.status(responseCode.Success).json({
       message: "Schedule updated successfully!",
       eventTask: eventTask,
@@ -115,7 +115,7 @@ schRouter.delete("/delete", async (req, res) => {
     },
   });
 
-  if (eventSchedules != []) {
+  if (eventSchedules != null) {
     res.status(responseCode.Success).json({
       message: "Schedule deleted successfully!",
       eventSchedules: eventSchedules,

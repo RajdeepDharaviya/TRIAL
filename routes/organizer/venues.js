@@ -33,7 +33,7 @@ const fetchEvents = async (id) => {
 venRouter.get("/", async (req, res) => {
   const events = await fetchEvents(req.userId);
 
-  if (events != []) {
+  if (events != null) {
     res.status(responseCode.Success).json({
       message: "events given below",
       events: events,
@@ -58,7 +58,7 @@ venRouter.post("/add", async (req, res) => {
     },
   });
 
-  if (eventvenues != []) {
+  if (eventvenues != null) {
     res.status(responseCode.Success).json({
       message: "Events venues ",
       eventvenues: eventvenues,
@@ -86,7 +86,7 @@ venRouter.put("/update", async (req, res) => {
     },
   });
 
-  if (eventvenue != []) {
+  if (eventvenue != null) {
     res.status(responseCode.Success).json({
       message: "Venue updated successfully!",
       eventvenue: eventvenue,
@@ -115,7 +115,7 @@ venRouter.delete("/delete", async (req, res) => {
     },
   });
 
-  if (eventvenue != []) {
+  if (eventvenue != null) {
     res.status(responseCode.Success).json({
       message: "Venue deleted successfully!",
       eventvenue: eventvenue,

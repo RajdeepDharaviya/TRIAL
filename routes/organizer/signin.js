@@ -16,7 +16,7 @@ signinRoute.post("/", async (req, res) => {
 
   if (signinSchema.safeParse(body).success) {
     // Inserting data into the database
-    const Organizer = await prisma.Organizer.findFirst({
+    const Organizer = await prisma.organizer.findUnique({
       where: {
         email: body.email,
         password: md5(body.password),
@@ -24,7 +24,7 @@ signinRoute.post("/", async (req, res) => {
     });
 
     // give response to the Organizer
-    if (Organizer != []) {
+    if (Organizer != null) {
       const token = jwt.sign(
         {
           email: Organizer.email,
@@ -37,9 +37,7 @@ signinRoute.post("/", async (req, res) => {
         token: "Bearer " + token,
       });
     } else {
-      res
-        .status(responseCode.InternalServerError)
-        .send("Something wrong with server, please try again after sometime!");
+      res.status(responseCode.InternalServerError).send("wrong credentials!");
     }
   } else {
     res.status(responseCode.NotValid).send(signinSchema.safeParse(body).error);

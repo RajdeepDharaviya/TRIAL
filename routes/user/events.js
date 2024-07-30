@@ -8,7 +8,7 @@ const eveRouter = express.Router();
 eveRouter.use(middleware);
 
 // Route for getting all events data
-/* ************** "http://localhost:3000/organization/events" ***************/
+/* ************** "http://localhost:3000/user/events" ***************/
 eveRouter.get("/:params", async (req, res) => {
   const params = req.params.params;
   let events;
@@ -21,6 +21,25 @@ eveRouter.get("/:params", async (req, res) => {
   } else if (params == "closed") {
     events = await prisma.eventManager.findMany({
       where: { e_isAct: false },
+    });
+  } else if (params == "participate") {
+    events = await prisma.eventManager.findMany({
+      where: {
+        e_isAct: true,
+      },
+      select: {
+        e_date: true,
+        e_name: true,
+        e_description: true,
+        e_mode: true,
+        e_rounds: true,
+        e_fees: true,
+        Registers: {
+          where: {
+            user_id: req.userId,
+          },
+        },
+      },
     });
   }
 
@@ -37,8 +56,9 @@ eveRouter.get("/:params", async (req, res) => {
 });
 
 // Route for getting all events data
-/* ************** "http://localhost:3000/organization/events/participate" ***************/
+/* ************** "http://localhost:3000/user/events/participate" ***************/
 eveRouter.get("/participate", async (req, res) => {
+  console.log("Hi tehre");
   const event = await prisma.eventManager.findMany({
     where: {
       e_isAct: true,
@@ -51,7 +71,7 @@ eveRouter.get("/participate", async (req, res) => {
       },
     },
   });
-
+  console.log("hi " + event);
   if (event != []) {
     res.status(responseCode.Success).json({
       message: "Events",
